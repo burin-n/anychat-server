@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/burin-n/anychat-server/issues"
   },
-  "homepage": "https://github.com/burin-n/anychat-server#readme"
+  "homepage": "https://github.com/burin-n/anychat-server#readme",
+  "dependencies": {
+    "express": "^4.16.3",
+    "socket.io": "^2.1.0",
+    "socketio": "^1.0.0"
+  }
 }
