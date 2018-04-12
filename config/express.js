@@ -32,6 +32,7 @@ module.exports = function(){
 
   //setting up routing -------------------------------------
   require('../routes/user.routes')(app);
+  require('../routes/chat.routes')(app);
 	//end setting up routing -------------------------------------
  // 
 	return app;
