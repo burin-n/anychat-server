@@ -24,13 +24,15 @@
     function getRandomInt(max) {
       return Math.floor(Math.random() * Math.floor(max));
     }
-    const group = 'group'+getRandomInt(2)
+    const group = "5acfb070fc8bc0363dd901e9"
+		const user = "5acfaffd15e9503415248acf" 
+		const userName = "test"
     const socket = io()
-    socket.emit('joinGroup', group)
+    socket.emit('joinGroup', {userId:user, groupId:group})
 
     $(function () {
       $('form').submit(function(){
-        const packet = { msg : $('#m').val(), groupId : group }
+        const packet = { msg : $('#m').val(), groupId : group, userId:user, time : new Date() , userName}
         
         socket.emit('send message', packet);
         $('#m').val('');
@@ -43,7 +45,7 @@
 
       socket.on('join', function(msg){
         console.log(msg)
-      })
+      });
     });
     </script>
   </body>
