@@ -18,20 +18,33 @@
     <form action="">
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-  <script>
-  $(function () {
-    var socket = io();
-    $('form').submit(function(){
-      socket.emit('chat message', $('#m').val());
-      $('#m').val('');
-      return false;
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+    function getRandomInt(max) {
+      return Math.floor(Math.random() * Math.floor(max));
+    }
+    const group = 'group'+getRandomInt(2)
+    const socket = io()
+    socket.emit('joinGroup', group)
+
+    $(function () {
+      $('form').submit(function(){
+        const packet = { msg : $('#m').val(), groupId : group }
+        
+        socket.emit('send message', packet);
+        $('#m').val('');
+        return false;
+      });
+
+      socket.on('chat message', function(msg){
+        $('#messages').append($('<li>').text(msg));
+      });
+
+      socket.on('join', function(msg){
+        console.log(msg)
+      })
     });
-    socket.on('chat message', function(msg){
-      $('#messages').append($('<li>').text(msg));
-    });
-  });
-</script>
+    </script>
   </body>
 </html>

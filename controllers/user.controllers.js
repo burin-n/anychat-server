@@ -16,5 +16,5 @@ exports.login = function(req,res){
 }
 
 exports.getProfile = function(req,res){
-
+	res.json({ok:"OK"})
 }
