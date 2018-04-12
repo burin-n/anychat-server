@@ -33,7 +33,7 @@ module.exports = function(){
 	// });
 
   //setting up routing -------------------------------------
-	// require('../routes/chat.routes')(app);
+  require('../routes/user.routes')(app);
 	//end setting up routing -------------------------------------
  // 
 	return app;
