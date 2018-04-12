@@ -1,8 +1,6 @@
-var mongoose = require('mongoose');
-
 module.exports = function(){
-
-	mongoose.set('debug');			// mode
+	const mongoose = require('mongoose');	
+	mongoose.set('debug',true);			// mode
 	var db = mongoose.connect('mongodb://localhost:27017'); // connect to database
 
 	// create collection

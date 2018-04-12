@@ -7,5 +7,5 @@ let userSchema = Schema({
 	chats: [Schema.Types.ObjectId]
 })
 
-mongoose.model('User',chatSchema);
+mongoose.model('User',userSchema);
 // chats list of group chat'id

@@ -2,8 +2,6 @@ var express = require('express');
 var morgan = require('morgan');
 var compression = require('compression');
 var bodyParser = require('body-parser');
-var routePATH = require('path').routePATH;
-
 
 module.exports = function(){
 

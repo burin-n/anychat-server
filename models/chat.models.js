@@ -11,3 +11,4 @@ mongoose.model('Chat',chatSchema);
 // members[i].id
 // members[i].name
 // members[i].state
+// members[i].session

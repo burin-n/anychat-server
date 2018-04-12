@@ -21,13 +21,24 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
   <script>
+  function getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
+  }
+  const group = 'group'+getRandomInt(2)
+  
   $(function () {
     var socket = io();
+    
+    socket.emit('join', group);
+
     $('form').submit(function(){
-      socket.emit('chat message', $('#m').val());
+      const packet = { msg : $('#m').val(), groupId : group }
+      
+      socket.emit('send message', packet);
       $('#m').val('');
       return false;
     });
+
     socket.on('chat message', function(msg){
       $('#messages').append($('<li>').text(msg));
     });
