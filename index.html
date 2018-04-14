@@ -24,11 +24,11 @@
     function getRandomInt(max) {
       return Math.floor(Math.random() * Math.floor(max));
     }
-    const group = "5acfb070fc8bc0363dd901e9"
+    const group = "5ad1a948018ad609a1bee512"
 		const user = "5acfaffd15e9503415248acf" 
 		const userName = "test"
     const socket = io()
-    socket.emit('joinGroup', {userId:user, groupId:group})
+    socket.emit('connectGroup', {userId:user, groupId:group})
 
     $(function () {
       $('form').submit(function(){

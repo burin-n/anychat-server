@@ -36,7 +36,21 @@ exports.modifyGroup = function(req,res){
 }
 
 exports.getGroup = function(req,res){
-	
+	Chat.findById(req.query.groupId)
+	.then( (chat) => {
+		console.log(chat)
+		const fields = ['name', 'members'];
+		let ret = {};
+		fields.forEach( (field) => {
+			ret[field] = chat[field];
+		});
+		ret.id = chat._id;
+		res.status(200).json({status:1, chat:ret});
+	})
+	.catch( (err) => {
+		console.error(err);
+		res.status(500).json({status:0, error:"error"});
+	})
 }
 
 
@@ -49,10 +63,13 @@ exports.deleteGroup = function(req,res){
 	},{ multi: true })
 		.then( (users) =>{
 			return Chat.findByIdAndRemove(req.body.groupId);
-		}).catch( () => {
-
+		}).catch( (err) => {
+			return Promise.reject(err);
 		}).then( () => {
 			res.status(200).json({status:1})
+		}).catch( (err) => {
+			console.error(err);
+			res.status(500).json({status:0, error: 'error'})
 		});
 }
 
