@@ -1,14 +1,12 @@
 let Chat = require('mongoose').model('Chat');
-// let User = require('mongoose').model('User');
+let User = require('mongoose').model('User');
 var _ = require('lodash');
-var sync = require('synchronize')
 
-exports.joinGroup = (socket) => {
-	return (userID, groupID) => {
-		console.log('connecting...')
-		socket.join(groupID);
-		updateSession({userID, groupID}, (status) => {
-			console.log(`${userID} join ${groupID} : ${status}`);
+exports.connectGroup = (socket) => {
+	return ({userId, groupId}) => {
+		socket.join(groupId);
+		updateSession({userId, groupId, socketId: socket.id}, (status) => {
+			console.log(`${userId} connect to ${groupId} with sesion ${socket.id}: ${status}`);
 			const ret = {
 				'status' : status,
 			}
@@ -17,105 +15,107 @@ exports.joinGroup = (socket) => {
 	}
 }
 
-exports.sendMessage = (io) => {
-	return function({msg,groupId}){
-		// saveMsgToDB(() => {
-			console.log(groupId + ' message ' + msg);
-			// io.emit('chat message', msg);
-			io.in(groupId).emit('chat message',msg);
-		// })
-	}
-}
-
-exports.getUnread = (io) => {
-	return function(packet){
-		console.log(packet)
-	}
-}
-
-exports.disconnect = (io) => {
-	return function(socket){
-		//updateState(userID,groupID,lastMsg)
-	}
-}
-
-function updateSession({userID,groupID}, callback){
-	Chat.findById(groupID, 'members', function(err, chat){
-
-	})
-	callback(1);
-}
-
-function saveMsgTODB(callback){
-
-}
-
-
-function updateState(userID,groupID,lastMsg){
-
-}
-
-exports.register = function(req,res){
-	Chat.create(req.body, (err,chat) =>{
-		if(err){
-			res.status(500).json({status:0, error:'error'});
-		}
-		else{
-			var ret = {};
-			var fields = ['name', 'members','_id'];
-			fields.forEach( (field) => {
-				if(field == '_id') ret['id'] = chat[field];
-				else ret[field] = chat[field];
-			});
-			res.status(200).json(ret);
-		}
-	});
-}
-
-exports.modify = function(req,res){
-	Chat.findByIdAndUpdate(req.groupId, req.body, {new: true}, function(err, chat) {
-		if(err){
-			res.status(500).json({status:0, error:"error"})
-		}
-		else{
-			var ret = {};
-			var fields = ['name', 'members','_id'];
-			fields.forEach( (field) => {
-				if(field == '_id') ret['id'] = chat[field];
-				else ret[field] = chat[field];
-			});
-			res.status(200).json(ret);
-		}
-	});
-}
-
-exports.leaveGroup = function(req,res){
-	
-	new Promise( (resolve,reject) => {
-		Chat.findById(req.groupId, function(err,chat){
-			if(err){
-				reject()
-			}
+exports.sendMessage = (io,socket) => {
+	return function({msg,userId,userName,groupId,time}){
+		saveMsgToDB( {msg,userId,userName,groupId,time}, (status, ret) => {
+			if(status == 0){
+				console.error(ret);
+				socket.to(socket.id).emit('error', 'send message error');
+			}	
 			else{
-				for(let i = 0; i<chat.members; i++){
-					if(chat.members[i].id === req.userId){
-						chat.members.splice(i, 1);
-						break;
-					}
-				}
-				_.unset(chat.state, userId);
-				resolve()
+				io.in(groupId).emit('chat message',msg);
 			}
 		});
-	}).then( () => {
-		// User.findById(userId, function(err,user){
+	}
+}
 
-	}).catch( () => {
-		return new Promise.reject();
-	}).then( () => {
-		res.status(200).json({});
-	}).catch( () => {
-		res.status(500).json({status:0, error:'error'});	
+exports.getUnread = (socket) => {
+	return function({userId, groupId}){
+		Chat.findById(groupId)
+		.then( (chat) => {
+			state = _.get(chat, ['state', userId]);
+			let i;
+			for( i = state.length-1; i>=0 ; i--){
+				if( state.message[i].time < state)
+					break;
+			}
+			let read = [];	
+			for( let j = 0 ; j<=i ;j++){
+				read.push(state.message[i]);
+			}
+			let unread = [];
+			for( j = i+1; j < state.length; j++){
+				unread.push(state.message[i]);
+			}
+			res.status(200).json({status:1 , read , unread});
+		})
+		.catch( (err) => {
+			console.error(err);
+			res.status(500).json({status:0, error: "error"});
+		})
+	}
+}
+
+// update state
+exports.notifyReceive = (io,socket) => {
+	return function({userId,groupId,lastMsg}){
+		Chat.findById(groupId, function(err, chat){
+			if(err){
+				console.error(err);
+				socket.to(socket.id).emit('error', 'nofity error');
+			}
+			else{
+				_.set(chat.state, [userId, 'state'], lastMsg);
+				chat.save( (err) => {
+					if(err){
+						console.error(err);
+						socket.to(socket.id).emit('error', 'nofity error');
+					}
+				});
+			}
+		});
+	}	
+}
+
+exports.disconnect = (socket) => {
+	return function(){
+
+	}
+}
+
+function updateSession({userId,groupId, socketId}, callback){
+	Chat.findById(groupId, function(err, chat){
+		if(err) callback(0);
+		else{
+			_.set(chat, ['state', userId, 'session'], socketId);
+			_.set(chat, ['state', userId, 'online'], true);
+			chat.save( (err) => {
+				if(err) callback(0);
+				else callback(1);	
+			});
+		}
 	});
+}
 
+function saveMsgToDB({msg,userId,userName,groupId,time},callback){
+	const pack = { 
+		userName,
+		userId, 
+		message: msg,
+		time,
+	};
+
+	Chat.findByIdAndUpdate(groupId , {
+		$push : {
+			message: pack 
+		}
+	}, { 'new' : true },
+	function(err, n_chat){
+		if(err){
+		 	callback(0,err);
+		}
+		else{
+			callback(1,n_chat)
+		}
+	});
 }

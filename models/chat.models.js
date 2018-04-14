@@ -22,18 +22,19 @@ mongoose.model('Chat',chatSchema);
 		name,
 	}
 */
-
 /*
 	state = {
 		id : {
 			session,
 			state,
+			online
 		}
 	}
 */
 /*
 	message[i] = {
-		user,
+		userName,
+		userId,
 		message,
 		time,
 	}
