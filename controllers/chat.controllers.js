@@ -57,7 +57,7 @@ exports.notifyReceive = (io,socket) => {
 
 exports.disconnect = (socket) => {
 	return function(){
-		updateState({socketId : socketId});
+		
 	}
 }
 

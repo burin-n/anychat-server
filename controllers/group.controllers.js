@@ -39,8 +39,21 @@ exports.getGroup = function(req,res){
 	
 }
 
-exports.deleteGroup = function(req,res){
 
+exports.deleteGroup = function(req,res){
+	User.update({},
+	{
+		$pull : {
+			"chats" : req.body.groupId
+		}
+	},{ multi: true })
+		.then( (users) =>{
+			return Chat.findByIdAndRemove(req.body.groupId);
+		}).catch( () => {
+
+		}).then( () => {
+			res.status(200).json({status:1})
+		});
 }
 
 exports.joinGroup = function(req,res){
@@ -51,7 +64,7 @@ exports.joinGroup = function(req,res){
 			else{
 				if(groupId in user.chats){
 					resolve(user);
-				}
+		 		}
 				else{
 					user.chats.push(groupId);
 					resolve(user);
