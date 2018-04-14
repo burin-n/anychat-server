@@ -7,7 +7,7 @@ exports.register = function(req,res){
 		}
 		else{
 			var ret = {};
-			var fields = ['username', 'name', 'password','_id'];
+			var fields = ['username', 'name', '_id'];
 			fields.forEach( (field) => {
 				if(field == '_id') ret['id'] = user[field];
 				else ret[field] = user[field];
@@ -25,7 +25,7 @@ exports.login = function(req,res){
 			res.json({error: 'Incorrect Username'});
 		} else if (req.body.password == user.password){
 			var ret = {};
-			var fields = ['username', 'name','_id'];
+			var fields = ['username', 'name', '_id'];
 			fields.forEach( (field) => {
 				if(field == '_id') ret['id'] = user[field];
 				else ret[field] = user[field];
@@ -43,7 +43,7 @@ exports.getProfile = function(req,res){
 			res.status(500).json({status:0, error:'get profile error'});
 		} else {
 			var ret = {};
-			var fields = ['username', 'name','_id'];
+			var fields = ['username', 'name', '_id'];
 			fields.forEach( (field) => {
 				if(field == '_id') ret['id'] = user[field];
 				else ret[field] = user[field];
