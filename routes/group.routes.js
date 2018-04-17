@@ -6,4 +6,5 @@ module.exports = function(app){
   	.delete(group.deleteGroup)
   	.post(group.createGroup);
 	app.post('/chat/join', group.joinGroup);
+	app.get('/chat/all' , group.getallgroup);
 }
