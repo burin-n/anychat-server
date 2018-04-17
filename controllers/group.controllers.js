@@ -1,5 +1,6 @@
 let User = require('mongoose').model('User');
 let Chat = require('mongoose').model('Chat');
+let _ = require('lodash');
 
 exports.createGroup = function(req,res){
 	Chat.create(req.body, (err,chat) =>{
@@ -33,6 +34,29 @@ exports.modifyGroup = function(req,res){
 			res.status(200).json(ret);
 		}
 	});
+}
+
+exports.getallgroup = (req,res) => {
+	const user_id = req.query.id;
+	let ret = [];	
+	Chat.find({})
+	.then( (chats) => {
+		chats.forEach( (chat) => {
+			let group = {};
+			group.id = chat._id;
+			group.name = chat.name;
+			group.n_member = chat.members.length;
+			if( _.get(chat, ['state', user_id ] ) === undefined)
+				group.ismember = false;
+			else
+				group.ismember = true;
+			ret.push(group);	
+		});
+		res.json(ret);
+	}).catch( err => {
+		console.error(err);
+		res.staus(500).json({status:0,error:"error"});
+	});	
 }
 
 exports.getGroup = function(req,res){
@@ -102,6 +126,7 @@ exports.joinGroup = function(req,res){
 					});
 					if(!isMember){
 						chat.members.push({id:user._id, name:user.name});
+						_.set(chat, ['state'] , null );
 						resolve({user,chat});
 					}
 					else resolve({user,chat});
