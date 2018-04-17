@@ -1,9 +1,6 @@
 let User = require('mongoose').model('User');
 let Chat = require('mongoose').model('Chat');
-<<<<<<< HEAD
-=======
 let _ = require('lodash');
->>>>>>> a08ec39b53e05940e2c47d8324c673abdd1d0c59
 
 exports.createGroup = function(req,res){
 	Chat.create(req.body, (err,chat) =>{
