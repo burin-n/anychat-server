@@ -34,7 +34,7 @@ module.exports = function(){
   //setting up routing -------------------------------------
   require('../routes/user.routes')(app);
 	require('../routes/group.routes')(app);
-	require('../routes/heartbeat.routes')(app);
+	//require('../routes/heartbeat.routes')(app);
 	//end setting up routing -------------------------------------
  //
 	return app;
