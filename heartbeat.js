@@ -9,8 +9,8 @@ if(port==''){
 }
 var server1Port = 3001; //set default port for main server
 var server2Port = 3002; //set default port for second server
-var pingInterval = 3000;    //ms
-var available;
+var pingtime = 300;    //ms
+var serve1up;
 var destinationPort;
 var server2down;
 var cors = require('cors');
@@ -18,49 +18,49 @@ app.use(cors());
 
 app.use(express.static('public'));
 
-function testMainServerConnection(){
-    var options = {
+function testServer(){
+    var info = {
         host: 'localhost',
         port: server1Port,
     };
-    var options2 = {
+    var info2 = {
         host: 'localhost',
         port: server2Port,
     };
     //ping using http get
-    let request = http.get(options, function(res) {
+    let request = http.get(info, function(res) {
         console.log('STATUS: ' + res.statusCode);
-        available = true;
+        serve1up = true;
     });
     request.on('error', function(e) {
-        //console.log(e.name);
-        available = false; 
+        
+        serve1up = false; 
     });
-     let request2 = http.get(options2, function(res) {
+     let request2 = http.get(info2, function(res) {
         console.log('STATUS: ' + res.statusCode);
         server2down = false;
     });
      request2.on('error', function(e) {
-        //console.log(e.name);
+        
         server2down = true; 
     });
-    //wait for one second after ping and then check if the server is available
+    //wait for one second after ping and then check if the server is serve1up
     setTimeout(() => {
         
-        if(available){
+        if(serve1up){
             console.log("success ping to port "+server1Port);   
             destinationPort = server1Port;  
         } 
+        // check if 2 server down
         else if(server2down) {
 
             console.log("all server down ");
             destinationPort = null;
 
         }
-        
 
         else{
-            console.log("failed ping to port "+server2Port);
+            console.log("success ping to port "+server2Port);
             destinationPort = server2Port;
         }
         console.log("heartbeat set port: "+destinationPort+" to client", new Date());
@@ -68,9 +68,9 @@ function testMainServerConnection(){
 };
 
 //check server every 300 msec
-var id = setInterval(testMainServerConnection, pingInterval);
+var id = setInterval(testServer, pingtime);
 
-
+//อาจจะเอาออกได้นะธิปก
 io.on('connection', function(socket){
     console.log(socket.id + ' joins the healthchecker');
 });
@@ -79,9 +79,8 @@ heartbeat.listen(Number(port), function(){
     console.log('started healthchecker on port '+port);
 });
 app.get('/check', function(req, res){
-    //what to send to client when they connect to healthchecker
-    //here client will receive destination url they have to connect to
-    testMainServerConnection();
+    
+    testServer();
     console.log('return : ',destinationPort);
     var d = new Date();
     var ds = d.toString();
@@ -94,7 +93,7 @@ app.get('/check', function(req, res){
 // exports.hbeat = (req,res) => {
 //   res.send('working');
 
-//    testMainServerConnection();
+//    testServer();
 //     console.log('return : ',destinationPort);
 //     var d = new Date();
 // 	var ds = d.toString();
