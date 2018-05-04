@@ -126,7 +126,7 @@ exports.joinGroup = function(req,res){
 					});
 					if(!isMember){
 						chat.members.push({id:user._id, name:user.name});
-						_.set(chat, ['state'] , {} );
+						_.set(chat, ['state', ,'id'] , {} );
 						resolve({user,chat});
 					}
 					else resolve({user,chat});

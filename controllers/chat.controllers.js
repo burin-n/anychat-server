@@ -21,7 +21,7 @@ exports.sendMessage = (io,socket) => {
 			if(status == 0){
 				console.error(ret);
 				socket.to(socket.id).emit('error', 'send message error');
-			}	
+			}
 			else{
 				io.in(groupId).emit('chat message',msg);
 			}
@@ -74,7 +74,7 @@ exports.notifyReceive = (io,socket) => {
 				});
 			}
 		});
-	}	
+	}
 }
 
 exports.disconnect = (socket) => {
@@ -83,18 +83,25 @@ exports.disconnect = (socket) => {
 	}
 }
 
-function updateSession({userId,groupId, socketId}, callback){
-	Chat.findById(groupId, function(err, chat){
-		if(err) callback(0);
-		else{
-			_.set(chat, ['state', userId, 'session'], socketId);
-			_.set(chat, ['state', userId, 'online'], true);
-			chat.save( (err) => {
-				if(err) callback(0);
-				else callback(1);	
-			});
-		}
-	});
+function updateSession({userId,groupId,socketId}, callback){
+	try{
+		Chat.findById(groupId, function(err, chat){
+			if(err) callback(0);
+			else if(!chat){
+				callback(0);
+			}
+			else{
+				_.set(chat, ['state', userId, 'session'], socketId);
+				_.set(chat, ['state', userId, 'online'], true);
+				chat.save( (err) => {
+					if(err) callback(0);
+					else callback(1);	
+				});
+			}
+		});
+	}catch(e){
+		callback(0);
+	}
 }
 
 function saveMsgToDB({msg,userId,userName,groupId,time},callback){

@@ -27,7 +27,7 @@
     const group = "5acfb070fc8bc0363dd901e9"
 		const user = "5acfaffd15e9503415248acf"
 		const userName = "test"
-    const socket = io('localhost:5000')
+    const socket = io('http://localhost:5000')
    // socket.emit('connectGroup', {userId:user, groupId:group})
 
     $(function () {
@@ -44,7 +44,8 @@
 			$('#messages').append($('<li>').text(msg));
     });
     socket.on('loadbalance', function(msg){
-			$('#messages').append($('<li>').text(msg));
+      $('#messages').append($('<li>').text(msg));
+        console.log(msg)
     });
 		socket.on('join', function(msg){
 			console.log(msg)
