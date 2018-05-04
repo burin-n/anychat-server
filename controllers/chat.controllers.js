@@ -50,18 +50,19 @@ exports.getUnread = (req,res) => {
 		else{
 			let date = new Date(state);
 			for(i ; i>=0; i--){
-				if(new Date(msg[i].time) < date) {
+				if(new Date(msg[i].time) <= date) {
 					break;
 				}
 			}
 		}
 		console.log(state,i)
 		let read = [];	
-		for( let j = 0 ; j<=i ;j++){
+		let j;
+		for( j = 0 ; j<=i ;j++){
 			read.push(msg[j]);
 		}
 		let unread = [];
-		for( j = i+1; j < msg.length; j++){
+		for( j; j < msg.length; j++){
 			unread.push(msg[j]);
 		}
 		res.status(200).json({status:1 , read , unread});
