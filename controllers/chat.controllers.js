@@ -34,19 +34,24 @@ exports.getUnread = (req,res) => {
 	
 	Chat.findById(groupId)
 	.then( (chat) => {
-		state = _.get(chat, ['state', userId]);
+		let state = _.get(chat, ['state', userId, 'state'], null);
+		let msg = _.get(chat, ['message']);
+		console.log(chat)
 		let i;
-		for( i = state.length-1; i>=0 ; i--){
-			if( state.message[i].time < state)
-				break;
+		if(state === null) i = msg.length-1;
+		else{
+			for( i = msg.length-1; i>=0 ; i--){
+					if( msg[i].time < state)
+						break;
+			}
 		}
 		let read = [];	
 		for( let j = 0 ; j<=i ;j++){
-			read.push(state.message[i]);
+			read.push(msg.message[i]);
 		}
 		let unread = [];
-		for( j = i+1; j < state.length; j++){
-			unread.push(state.message[i]);
+		for( j = i+1; j < msg.length; j++){
+			unread.push(msg[i]);
 		}
 		res.status(200).json({status:1 , read , unread});
 	})
