@@ -47,17 +47,15 @@ exports.getallgroup = (req,res) => {
 			group.id = chat._id;
 			group.name = chat.name;
 			group.n_member = chat.members.length;
+			group.members = chat.members;
 			console.log(user_id)
 			console.log(chat ['state'])
-			group.ismember = false;
+			group.ismember = chat.members.reduce( (acc,it) => {
+				return acc || it.id == user_id;
+			}, false)
 
-			for(let i=0; i<chat.members.length; i++){
-				if(chat.members[i] == user_id)
-					group.ismember = true;
-			}
 			ret.push(group);
 		});
-		ret.push(chats);
 		res.json(ret);
 	}).catch( err => {
 		console.error(err);
