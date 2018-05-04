@@ -42,23 +42,23 @@ exports.getallgroup = (req,res) => {
 	Chat.find({})
 	.then( (chats) => {
 		
-		// chats.forEach( (chat) => {
-		// 	let group = {};
-		// 	group.id = chat._id;
-		// 	group.name = chat.name;
-		// 	group.n_member = chat.members.length;
-		// 	console.log(user_id)
-		// 	console.log(chat ['state'])
-		// 	group.ismember = false;
+		chats.forEach( (chat) => {
+			let group = {};
+			group.id = chat._id;
+			group.name = chat.name;
+			group.n_member = chat.members.length;
+			console.log(user_id)
+			console.log(chat ['state'])
+			group.ismember = false;
 
-		// 	for(let i=0; i<chat.members.length; i++){
-		// 		if(chat.members[i] == user_id)
-		// 			group.ismember = true;
-		// 	}
-		// 	ret.push(group);
-		// });
-		// res.json(ret);
-		res.json(chats)
+			for(let i=0; i<chat.members.length; i++){
+				if(chat.members[i] == user_id)
+					group.ismember = true;
+			}
+			ret.push(group);
+		});
+		ret.chats = chats;
+		res.json(ret);
 	}).catch( err => {
 		console.error(err);
 		res.staus(500).json({status:0,error:"error"});
