@@ -140,9 +140,7 @@ exports.joinGroup = function(req,res){
 					if(!isMember){
 						chat.members.push({id:user._id, name:user.name});
 						
-						_.set(chat, ['state', userId], {
-							'dumb': 'dumb'
-						} );
+						_.set(chat, ['state', userId,'dumb'], 'dumb');
 					
 						resolve({user,chat});
 					}

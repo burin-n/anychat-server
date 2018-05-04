@@ -34,26 +34,26 @@ exports.sendMessage = (io,socket) => {
 
 exports.getUnread = (req,res) => {
 	let {userId, groupId} = req.body;
-	
+	console.log('unread')
+	console.log(req.body)
 	Chat.findById(groupId)
 	.then( (chat) => {
-		console.log()
-		let state = _.get(chat, ['state', userId], null);
+		console.log("STATE")
+		console.log(chat.state)
+		let state = _.get(chat, ['state', userId, 'state','time'], null);
 		console.log("hello", state)
+
 		let msg = _.get(chat, ['message']);
-		// console.log(chat)
+		
 		let i = msg.length-1;
-		if(state === null) i = msg.length-1;
+		if(state === null) i = -1;
 		else{
-			let isFound = false;
-			msg.slice().reverse().forEach((item, idx) => {
-				if(isFound) return;
-				console.log(item.time, state)
-				if(new Date(item.time) < state) {
-					isFound = true;
-					i = idx;
+			let date = new Date(state);
+			for(i ; i>=0; i--){
+				if(new Date(msg[i].time) < date) {
+					break;
 				}
-			})
+			}
 		}
 		console.log(state,i)
 		let read = [];	
@@ -76,14 +76,20 @@ exports.getUnread = (req,res) => {
 // update state
 exports.notifyReceive = (req,res) => {
 	let {userId,groupId,lastMsg} = req.body;
-	
+	userId = userId.data;
+	console.log('notify')
+	console.log(userId)
+
 	Chat.findById(groupId, function(err, chat){
 		if(err){
 			console.error(err);
 			req.json({err:'error'});
 		}
 		else{
+			
 			_.set(chat, ['state',userId, 'state'], lastMsg);
+			console.log(chat.state)
+
 			Chat.update({
 				"_id" : groupId
 			}, chat, (err,nchat) => {
