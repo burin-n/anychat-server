@@ -57,7 +57,7 @@ exports.getallgroup = (req,res) => {
 			}
 			ret.push(group);
 		});
-		ret.chats = chats;
+		ret.push(chats);
 		res.json(ret);
 	}).catch( err => {
 		console.error(err);
