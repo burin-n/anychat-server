@@ -67,7 +67,7 @@ exports.getUnread = (req,res) => {
 
 // update state
 exports.notifyReceive = (req,res) => {
-	return function({userId,groupId,lastMsg}){
+	let {userId,groupId,lastMsg} = req.body;
 		
 		Chat.findById(groupId, function(err, chat){
 			if(err){
