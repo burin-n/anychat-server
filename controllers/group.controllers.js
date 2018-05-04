@@ -102,6 +102,9 @@ exports.joinGroup = function(req,res){
 	new Promise( (resolve,reject) => {
 		User.findById(userId, function(err,user){
 			if(err) reject(err);
+			else if(user == null){
+				console.log('no user')
+			}
 			else{
 				if(groupId in user.chats){
 					resolve(user);
@@ -121,12 +124,15 @@ exports.joinGroup = function(req,res){
 				else{
 					let isMember = false;
 					chat.members.forEach( (member) => {
-						if(member.id === userId)
+						if(member.id.toString() === userId)
 							isMember = true;
 					});
 					if(!isMember){
+						console.log(userId)
+						if(chat.state === null)
+							_.set(chat, ['state'], {});
 						chat.members.push({id:user._id, name:user.name});
-						_.set(chat, ['state', ,'id'] , {} );
+						_.set(chat, ['state', userId],{} );
 						resolve({user,chat});
 					}
 					else resolve({user,chat});
