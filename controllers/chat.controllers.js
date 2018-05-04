@@ -13,7 +13,6 @@ exports.connectGroup = (socket) => {
 			}
 			console.log('printintintin')
 			// socket.to(socket.id).emit('join', ret);
-			socket.emit('join',ret);
 		});
 	}
 }

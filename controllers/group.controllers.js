@@ -41,11 +41,14 @@ exports.getallgroup = (req,res) => {
 	let ret = [];
 	Chat.find({})
 	.then( (chats) => {
+		
 		chats.forEach( (chat) => {
 			let group = {};
 			group.id = chat._id;
 			group.name = chat.name;
 			group.n_member = chat.members.length;
+			console.log(user_id)
+			console.log(chat ['state'])
 			if( _.get(chat, ['state', user_id ] ) === undefined)
 				group.ismember = false;
 			else
@@ -97,8 +100,11 @@ exports.deleteGroup = function(req,res){
 		});
 }
 
+
+
 exports.joinGroup = function(req,res){
 	const {userId, groupId} = req.body;
+	
 	new Promise( (resolve,reject) => {
 		User.findById(userId, function(err,user){
 			if(err) reject(err);
@@ -131,10 +137,11 @@ exports.joinGroup = function(req,res){
 					});
 
 					if(!isMember){
-
 						chat.members.push({id:user._id, name:user.name});
 						
-						_.set(chat, ['state', userId], {'dumb': 'dumb'} );
+						_.set(chat, ['state', userId], {
+							'dumb': 'dumb'
+						} );
 					
 						resolve({user,chat});
 					}
@@ -157,11 +164,15 @@ exports.joinGroup = function(req,res){
 		return Promise.reject(err);
 	}).then( (chat) => {
 		console.log('last',chat)
-
-		chat.save( (err,nchat) => {
-			if(err) reject(err);
-			else res.json(nchat);
-			// else res.json({ status:1, mesage:"joined"});
+		return new Promise( (resolve,reject) => {
+			Chat.update({
+				_id: groupId
+			},chat, (err,result) => {
+				if(err)
+					console.error(err);
+				else
+					res.json(result)
+			});
 		});
 	}).catch( (err) => {
 		console.error(err);
