@@ -50,11 +50,11 @@ exports.getUnread = (req,res) => {
 		}
 		let read = [];	
 		for( let j = 0 ; j<=i ;j++){
-			read.push(msg.message[i]);
+			read.push(msg[i]);
 		}
 		let unread = [];
 		for( j = i+1; j < msg.length; j++){
-			unread.push(msg[i]);
+			unread.push(msg[j]);
 		}
 		res.status(200).json({status:1 , read , unread});
 	})
