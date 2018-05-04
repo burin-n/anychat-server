@@ -1,4 +1,3 @@
-
 var cors = require('cors')
 var get = require('http').get;
 var port = process.argv.slice(2);
@@ -9,12 +8,12 @@ if(port==''){
 
 var server1Port = 3001; //set default port for main server
 var server2Port = 3002; //set default port for second server
-var pingtime = 1000;    //ms
+var pingtime = 10;    //ms
 var serve1up;
 var destinationPort = null;
 var server2up;
 var prevPort = null;
-
+const url = 'http://172.20.10.10:'
 
 var app = require('express')();
 
@@ -28,9 +27,9 @@ app.get('/', function(req, res){
         });
     }
     else{
-    res.json({'destination' : 'http://localhost:'+destinationPort,
-            'timestamp' : new Date()
-        });
+    res.json({'destination' : url+destinationPort,
+        'timestamp' : new Date()
+    });
     }
 });
 
@@ -42,7 +41,7 @@ var id = setInterval( () => testServer(), pingtime);
 
 io.on('connection', function(socket){
     if(destinationPort === null) destination = null;
-    else destination = 'http://localhost:'+destinationPort;
+    else destination = url+destinationPort;
     socket.emit('loadbalance',{
         destination,
         'timestamp' : new Date()
@@ -60,7 +59,7 @@ function checkEmit(socket){
     if (prevPort != destinationPort){
 
         if(destinationPort === null) destination = null;
-        else destination = 'http://localhost:'+destinationPort;
+        else destination = url+destinationPort;
         
         io.emit('loadbalance',{
             destination,
@@ -78,11 +77,11 @@ function testServer(){
     
 
     let info = {
-        host: 'localhost',
+        host: '172.20.10.10',
         port: server1Port,
     };
     let info2 = {
-        host: 'localhost',
+        host: '172.20.10.10',
         port: server2Port,
     };
     //ping using http get
@@ -113,6 +112,6 @@ function testServer(){
             console.log("success ping to port "+server2Port);
             destinationPort = server2Port;
         }
-        console.log("heartbeat set port: "+destinationPort+" to client", new Date());
+        console.log(url+destinationPort+" to client", new Date());
     }, 1000);
 };
