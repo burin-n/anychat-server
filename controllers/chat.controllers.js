@@ -26,7 +26,7 @@ exports.sendMessage = (io,socket) => {
 				socket.to(socket.id).emit('error', 'send message error');
 			}
 			else{
-				io.in(groupId).emit('chat message',msg);
+				io.in(groupId).emit('chat message',{msg,userId,userName,groupId,time});
 			}
 		});
 	}
