@@ -14,6 +14,7 @@ var serve1up;
 var destinationPort;
 var server2up;
 var change = 0;
+var print = 0;
 
 var app = require('express')();
 
@@ -39,14 +40,15 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 io.on('connection', function(socket){
-    testServer(socket);
+    var id = setInterval(() => testServer(socket), pingtime);
+    // testServer(socket);
   });
   
   http.listen(port, function(){
     console.log('listening on', port);
   });
 
-  var id = setInterval(testServer, pingtime);
+ 
 
 
 
@@ -70,7 +72,8 @@ function testServer(socket){
     });
     request.on('error', function(e) {
         serve1up = false;
-        change = 1;
+        // change = 1;
+        print = 0;
     });
      let request2 = get(info2, function(res) {
         console.log('STATUS: ' + res.statusCode);
@@ -78,7 +81,8 @@ function testServer(socket){
     });
      request2.on('error', function(e) {
         server2up = false;
-        change = 1;
+        // change = 1;
+        // print = 0;
     });
     //wait for one second after ping and then check if the server is serve1up
 
@@ -87,28 +91,38 @@ function testServer(socket){
         if(serve1up){
             console.log("success ping to port "+server1Port);
             destinationPort = server1Port;
-            if (change){
+            if (change && !print){
                 socket.emit('loadbalance',{
                     'destination' : 'http://localhost:'+destinationPort,
                     'timestamp' : new Date()
                 });
                 change = 0;
+                print = 1;
             };
 
         // check if 2 server down
         } else if(!server2up) {
             console.log("all server down ");
             destinationPort = null;
-            if (change){
+            if (change && !print){
+                socket.emit('loadbalance',{
+                    'destination' : 'all server down',
+                    'timestamp' : new Date()
+                });
+                change = 0;
+                print = 1;
+            }
+        } else{
+            console.log("success ping to port "+server2Port);
+            destinationPort = server2Port;
+            if (change && !print){
                 socket.emit('loadbalance',{
                     'destination' : 'http://localhost:'+destinationPort,
                     'timestamp' : new Date()
                 });
                 change = 0;
+                print = 1;
             }
-        } else{
-            console.log("success ping to port "+server2Port);
-            destinationPort = server2Port;
         }
         console.log("heartbeat set port: "+destinationPort+" to client", new Date());
     }, 1000);
