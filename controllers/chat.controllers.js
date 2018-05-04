@@ -37,24 +37,32 @@ exports.getUnread = (req,res) => {
 	
 	Chat.findById(groupId)
 	.then( (chat) => {
-		let state = _.get(chat, ['state', userId, 'state','time'], null);
+		console.log()
+		let state = _.get(chat, ['state', userId], null);
+		console.log("hello", state)
 		let msg = _.get(chat, ['message']);
-		console.log(chat)
-		let i;
+		// console.log(chat)
+		let i = msg.length-1;
 		if(state === null) i = msg.length-1;
 		else{
-			for( i = msg.length-1; i>=0 ; i--){
-					if( msg[i].time < state)
-						break;
-			}
+			let isFound = false;
+			msg.slice().reverse().forEach((item, idx) => {
+				if(isFound) return;
+				console.log(item.time, state)
+				if(new Date(item.time) < state) {
+					isFound = true;
+					i = idx;
+				}
+			})
 		}
+		console.log(state,i)
 		let read = [];	
 		for( let j = 0 ; j<=i ;j++){
-			read.push(msg.message[i]);
+			read.push(msg[j]);
 		}
 		let unread = [];
 		for( j = i+1; j < msg.length; j++){
-			unread.push(msg[i]);
+			unread.push(msg[j]);
 		}
 		res.status(200).json({status:1 , read , unread});
 	})
@@ -75,17 +83,14 @@ exports.notifyReceive = (req,res) => {
 			req.json({err:'error'});
 		}
 		else{
-			_.set(chat.state, [userId, 'state'], lastMsg);
-			chat.save( (err) => {
+			_.set(chat, ['state',userId, 'state'], lastMsg);
+			Chat.update({
+				"_id" : groupId
+			}, chat, (err,nchat) => {
 				if(err){
-					console.error(err);
-					res.json({err:'error'});
+					
 				}
-				else{
-					res.json({
-						msg: lastMsg
-					});
-				}
+				else res.json(nchat);
 			});
 		}
 	});

@@ -195,7 +195,7 @@ exports.leaveGroup = function(req,res){
 						break;
 					}
 				}
-				_.unset(chat, ['state', userId]);
+			//	_.unset(chat, ['state', userId]);
 				resolve(chat)
 			}
 		});
