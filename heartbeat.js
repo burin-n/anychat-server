@@ -12,13 +12,14 @@ var server2Port = 3002; //set default port for second server
 var pingtime = 1000;    //ms
 var serve1up;
 var destinationPort;
-var server2down;
+var server2up;
+var change = 0;
 var cors = require('cors');
 app.use(cors());
 
 app.use(express.static('public'));
 
-function testServer(){
+function testServer(socket){
     let info = {
         host: 'localhost',
         port: server1Port,
@@ -31,16 +32,19 @@ function testServer(){
     let request = http.get(info, function(res) {
         console.log('STATUS: ' + res.statusCode);
         serve1up = true;
+        change = 1;
     });
     request.on('error', function(e) {
         serve1up = false;
+        change = 1;
     });
      let request2 = http.get(info2, function(res) {
         console.log('STATUS: ' + res.statusCode);
-        server2down = false;
+        server2up = true;
     });
      request2.on('error', function(e) {
-        server2down = true;
+        server2up = false;
+        change = 1;
     });
     //wait for one second after ping and then check if the server is serve1up
     setTimeout(() => {
@@ -48,15 +52,26 @@ function testServer(){
         if(serve1up){
             console.log("success ping to port "+server1Port);
             destinationPort = server1Port;
-        }
-        // check if 2 server down
-        else if(server2down) {
+            if (change){
+                socket.emit('loadbalance',{
+                    'destination' : 'http://localhost:'+destinationPort,
+                    'timestamp' : new Date()
+                });
+                change = 0;
+                };
 
+        // check if 2 server down
+        } else if(!server2up) {
             console.log("all server down ");
             destinationPort = null;
-
-        }
-        else{
+            if (change){
+                socket.emit('loadbalance',{
+                    'destination' : 'http://localhost:'+destinationPort,
+                    'timestamp' : new Date()
+                });
+                change = 0;
+            }
+        } else{
             console.log("success ping to port "+server2Port);
             destinationPort = server2Port;
         }
@@ -85,6 +100,11 @@ app.get('/', function(req, res){
             'timestamp' : new Date()
         });
     }
+});
+
+io.on('connection', function(socket){
+    testServer(socket)
+    console.log('loadbalancer connected');
 });
 
 

@@ -25,13 +25,13 @@
       return Math.floor(Math.random() * Math.floor(max));
     }
     const group = "5acfb070fc8bc0363dd901e9"
-		const user = "5acfaffd15e9503415248acf" 
+		const user = "5acfaffd15e9503415248acf"
 		const userName = "test"
-    const socket = io()
-    socket.emit('connectGroup', {userId:user, groupId:group})
+    const socket = io('localhost:5000')
+   // socket.emit('connectGroup', {userId:user, groupId:group})
 
     $(function () {
-     
+
     });
 		 $('form').submit(function(){
         const packet = { msg : $('#m').val(), groupId : group, userId:user, time : new Date() , userName}
@@ -42,8 +42,10 @@
 		});
 		socket.on('chat message', function(msg){
 			$('#messages').append($('<li>').text(msg));
-		});
-
+    });
+    socket.on('loadbalance', function(msg){
+			$('#messages').append($('<li>').text(msg));
+    });
 		socket.on('join', function(msg){
 			console.log(msg)
 		});
