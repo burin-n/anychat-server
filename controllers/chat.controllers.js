@@ -68,29 +68,27 @@ exports.getUnread = (req,res) => {
 // update state
 exports.notifyReceive = (req,res) => {
 	let {userId,groupId,lastMsg} = req.body;
-		
-		Chat.findById(groupId, function(err, chat){
-			if(err){
-				console.error(err);
-				req.json({err:'error'});
-			}
-			else{
-				_.set(chat.state, [userId, 'state'], lastMsg);
-				chat.save( (err) => {
-					if(err){
-						console.error(err);
-						res.json({err:'error'});
-					}
-					else{
-						res.json({
-							msg: lastMsg
-						});
-					}
-				});
-			}
-		});
 	
-	}
+	Chat.findById(groupId, function(err, chat){
+		if(err){
+			console.error(err);
+			req.json({err:'error'});
+		}
+		else{
+			_.set(chat.state, [userId, 'state'], lastMsg);
+			chat.save( (err) => {
+				if(err){
+					console.error(err);
+					res.json({err:'error'});
+				}
+				else{
+					res.json({
+						msg: lastMsg
+					});
+				}
+			});
+		}
+	});
 }
 
 exports.disconnect = (socket) => {
