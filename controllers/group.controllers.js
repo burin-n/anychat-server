@@ -119,7 +119,9 @@ exports.joinGroup = function(req,res){
 		return Promise.reject(err);
 	}).then( (user) => {
 		return new Promise( (resolve,reject) => {
+		
 			Chat.findById(groupId, function(err,chat){
+			
 				if(err) reject(err);
 				else{
 					let isMember = false;
@@ -127,21 +129,24 @@ exports.joinGroup = function(req,res){
 						if(member.id.toString() === userId)
 							isMember = true;
 					});
+
 					if(!isMember){
-						console.log(userId)
-						if(chat.state === null)
-							_.set(chat, ['state'], {});
+
 						chat.members.push({id:user._id, name:user.name});
-						_.set(chat, ['state', userId],{} );
+						
+						_.set(chat, ['state', userId], {'dumb': 'dumb'} );
+					
 						resolve({user,chat});
 					}
 					else resolve({user,chat});
-				}
+				}			
+				
 			});
 		});
 	}).catch( (err) => {
 		return Promise.reject(err);
 	}).then( ({user,chat}) => {
+		
 		return new Promise( (resolve,reject) => {
 			user.save( (err) => {
 				if(err) reject();
@@ -151,9 +156,12 @@ exports.joinGroup = function(req,res){
 	}).catch( (err) => {
 		return Promise.reject(err);
 	}).then( (chat) => {
-		chat.save( (err) => {
+		console.log('last',chat)
+
+		chat.save( (err,nchat) => {
 			if(err) reject(err);
-			else res.json({ status:1, mesage:"joined"});
+			else res.json(nchat);
+			// else res.json({ status:1, mesage:"joined"});
 		});
 	}).catch( (err) => {
 		console.error(err);
@@ -162,34 +170,36 @@ exports.joinGroup = function(req,res){
 }
 
 exports.leaveGroup = function(req,res){
-
+	let {groupId, userId} = req.body;
 	new Promise( (resolve,reject) => {
-		Chat.findById(req.groupId, function(err,chat){
+		Chat.findById(groupId, function(err,chat){
 			if(err){
 				reject(err)
 			}
 			else{
-				for(let i = 0; i<chat.members; i++){
-					if(chat.members[i].id === req.userId){
+				for(let i = 0; i<chat.members.length; i++){
+					if(chat.members[i].id == userId){
 						chat.members.splice(i, 1);
 						break;
 					}
 				}
-				_.unset(chat.state, userId);
+				_.unset(chat, ['state', userId]);
 				resolve(chat)
 			}
 		});
 	}).catch( (err) => {
 		return Promise.reject(err);
 	}).then( (chat) => {
-		User.findById(userId, function(err,user){
-			if(err){
-				reject(err);
-			}
-			else{
-				user.chats.splice(user.chats.indexOf(groupId),1);
-				resovle({chat,user});
-			}
+		return new Promise( (resolve,reject) => {
+			User.findById(userId, function(err,user){
+				if(err){
+					reject(err);
+				}
+				else{
+					user.chats.splice(user.chats.indexOf(groupId),1);
+					resolve({chat,user});
+				}
+			});
 		});
 	}).catch( (err) => {
 		return Promise.reject(err);
@@ -213,9 +223,14 @@ exports.leaveGroup = function(req,res){
 		console.error(err);
 		res.status(500).json({status:0, error:'error'});
 	}).then( (n_user) => {
-		n_user.id = n_user._id;
-		n_user._id = undefined;
-		res.status(200).json(n_user);
+		
+		
+		res.status(200).json({
+			id : n_user._id,
+			username : n_user.username,
+			chats : n_user.chats,
+			name : n_user.name
+		});
 	});
 
 }

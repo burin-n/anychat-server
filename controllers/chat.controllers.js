@@ -29,32 +29,33 @@ exports.sendMessage = (io,socket) => {
 	}
 }
 
-exports.getUnread = (socket) => {
-	return function({userId, groupId}){
-		Chat.findById(groupId)
-		.then( (chat) => {
-			state = _.get(chat, ['state', userId]);
-			let i;
-			for( i = state.length-1; i>=0 ; i--){
-				if( state.message[i].time < state)
-					break;
-			}
-			let read = [];	
-			for( let j = 0 ; j<=i ;j++){
-				read.push(state.message[i]);
-			}
-			let unread = [];
-			for( j = i+1; j < state.length; j++){
-				unread.push(state.message[i]);
-			}
-			res.status(200).json({status:1 , read , unread});
-		})
-		.catch( (err) => {
-			console.error(err);
-			res.status(500).json({status:0, error: "error"});
-		})
-	}
+exports.getUnread = (req,res) => {
+	let {userId, groupId} = req.body;
+	
+	Chat.findById(groupId)
+	.then( (chat) => {
+		state = _.get(chat, ['state', userId]);
+		let i;
+		for( i = state.length-1; i>=0 ; i--){
+			if( state.message[i].time < state)
+				break;
+		}
+		let read = [];	
+		for( let j = 0 ; j<=i ;j++){
+			read.push(state.message[i]);
+		}
+		let unread = [];
+		for( j = i+1; j < state.length; j++){
+			unread.push(state.message[i]);
+		}
+		res.status(200).json({status:1 , read , unread});
+	})
+	.catch( (err) => {
+		console.error(err);
+		res.status(500).json({status:0, error: "error"});
+	})
 }
+
 
 // update state
 exports.notifyReceive = (io,socket) => {

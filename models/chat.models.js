@@ -9,7 +9,7 @@ let chatSchema = new Schema({
   members: [{}],
   state: {
   	type: {},
-  	default: null
+		default: {}
   },
   message: [{}],
 });

@@ -6,7 +6,7 @@ module.exports = function(app){
 	io.on('connection', function(socket){
 		socket.on('connectGroup', chat.connectGroup(socket));
 		socket.on('send message', chat.sendMessage(io,socket));
-		socket.on('get unread', chat.getUnread(io));
+		// socket.on('get unread', chat.getUnread(io));
 		socket.on('disconnect', chat.disconnect(socket));
 		socket.on('notify', chat.notifyReceive(io,socket));
 	});
