@@ -8,7 +8,7 @@ module.exports = function(app){
 		socket.on('send message', chat.sendMessage(io,socket));
 		// socket.on('get unread', chat.getUnread(io));
 		socket.on('disconnect', chat.disconnect(socket));
-		socket.on('notify', chat.notifyReceive(io,socket));
+		// socket.on('notify', chat.notifyReceive(io,socket));
 	});
 	return http;
 }

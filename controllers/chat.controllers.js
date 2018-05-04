@@ -37,7 +37,7 @@ exports.getUnread = (req,res) => {
 	
 	Chat.findById(groupId)
 	.then( (chat) => {
-		let state = _.get(chat, ['state', userId, 'state'], null);
+		let state = _.get(chat, ['state', userId, 'state','time'], null);
 		let msg = _.get(chat, ['message']);
 		console.log(chat)
 		let i;
@@ -66,23 +66,30 @@ exports.getUnread = (req,res) => {
 
 
 // update state
-exports.notifyReceive = (io,socket) => {
+exports.notifyReceive = (req,res) => {
 	return function({userId,groupId,lastMsg}){
+		
 		Chat.findById(groupId, function(err, chat){
 			if(err){
 				console.error(err);
-				socket.to(socket.id).emit('error', 'nofity error');
+				req.json({err:'error'});
 			}
 			else{
 				_.set(chat.state, [userId, 'state'], lastMsg);
 				chat.save( (err) => {
 					if(err){
 						console.error(err);
-						socket.to(socket.id).emit('error', 'nofity error');
+						res.json({err:'error'});
+					}
+					else{
+						res.json({
+							msg: lastMsg
+						});
 					}
 				});
 			}
 		});
+	
 	}
 }
 

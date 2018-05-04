@@ -10,4 +10,5 @@ module.exports = function(app){
 	app.get('/chat/all' , group.getallgroup);
 	app.post('/chat/leave', group.leaveGroup);
 	app.post('/unread', chat.getUnread);
+	app.post('/notify', chat.notifyReceive);
 }
