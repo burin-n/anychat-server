@@ -12,21 +12,26 @@ exports.connectGroup = (socket) => {
 				'status' : status,
 			}
 			console.log('printintintin')
-			socket.to(socket.id).emit('joined', ret);
-			socket.emit('joined',ret);
+			// socket.to(socket.id).emit('join', ret);
+			socket.emit('join',ret);
 		});
 	}
 }
 
 exports.sendMessage = (io,socket) => {
+	console.log('send meg')
 	return function({msg,userId,userName,groupId,time}){
+		console.log('in meg')
 		saveMsgToDB( {msg,userId,userName,groupId,time}, (status, ret) => {
 			if(status == 0){
 				console.error(ret);
 				socket.to(socket.id).emit('error', 'send message error');
 			}
 			else{
-				io.in(groupId).emit('chat message',msg);
+				console.log('ret',ret)
+				io.in(groupId).emit('chat message', {
+					msg,userId,userName,groupId,time
+				});
 			}
 		});
 	}
