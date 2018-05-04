@@ -77,10 +77,8 @@ app.get('/check', function(req, res){
     
     testServer();
     console.log('return : ',destinationPort);
-    var d = new Date();
-    var ds = d.toString();
     res.send({'destination' : 'http://localhost:'+destinationPort,
-                'date': ds
+            'timestamp' : new Date()
     });
 });
 
