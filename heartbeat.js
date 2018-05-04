@@ -5,7 +5,7 @@ var http = require('http');
 var io = require('socket.io')(heartbeat);
 var port = process.argv.slice(2);   
 if(port==''){
-	port = 3000;    
+	port = 5000;    
 }
 var server1Port = 3001; //set default port for main server
 var server2Port = 3002; //set default port for second server
@@ -19,11 +19,11 @@ app.use(cors());
 app.use(express.static('public'));
 
 function testServer(){
-    var info = {
+    let info = {
         host: 'localhost',
         port: server1Port,
     };
-    var info2 = {
+    let info2 = {
         host: 'localhost',
         port: server2Port,
     };
@@ -33,7 +33,6 @@ function testServer(){
         serve1up = true;
     });
     request.on('error', function(e) {
-        
         serve1up = false; 
     });
      let request2 = http.get(info2, function(res) {
@@ -41,7 +40,6 @@ function testServer(){
         server2down = false;
     });
      request2.on('error', function(e) {
-        
         server2down = true; 
     });
     //wait for one second after ping and then check if the server is serve1up
@@ -70,14 +68,11 @@ function testServer(){
 //check server every 300 msec
 var id = setInterval(testServer, pingtime);
 
-//อาจจะเอาออกได้นะธิปก
-io.on('connection', function(socket){
-    console.log(socket.id + ' joins the healthchecker');
-});
 
 heartbeat.listen(Number(port), function(){
     console.log('started healthchecker on port '+port);
 });
+
 app.get('/check', function(req, res){
     
     testServer();

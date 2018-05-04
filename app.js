@@ -10,24 +10,9 @@ app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
 
-let reserveserver;
+if (port == '') 
+    port = 3001;
+
 http.listen(Number(port), function(){
     console.log('started on port ' + port);
 });
-if (port == 3001){
-    reserveserver = 3002;
-}else{
-    reserveserver = 3001;
-}
-
-//console.log('connect to',anotherserver);
-
-let socketserver = require('socket.io-client')('http://localhost:'+reserveserver);
-socketserver.on('connect', ()=>{
-    console.log('created' , port);
-});
-
-
-// http.listen(3001, function(){
-//   console.log('listening on *:3001');
-// });

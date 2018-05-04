@@ -10,6 +10,7 @@ let userSchema = Schema({
 	},
 	name: String,
 	password: String,
+	picture: Number,
 	chats: [Schema.Types.ObjectId]
 })
 

@@ -10,7 +10,6 @@ module.exports = function(){
 	app.use(cors());
 	// setting environment ---------------------------------------
 	app.use(compression());
-	// app.use(morgan(':remote-addr :remote-user [:date[clf]] HTTP/:http-version" :method :url :status :res[content-length] - :response-time ms :user-agent'));
 
 
 	app.use(bodyParser.urlencoded({
@@ -34,7 +33,6 @@ module.exports = function(){
   //setting up routing -------------------------------------
   require('../routes/user.routes')(app);
 	require('../routes/group.routes')(app);
-	//require('../routes/heartbeat.routes')(app);
 	//end setting up routing -------------------------------------
  //
 	return app;
