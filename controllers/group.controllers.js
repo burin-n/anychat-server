@@ -49,10 +49,12 @@ exports.getallgroup = (req,res) => {
 			group.n_member = chat.members.length;
 			console.log(user_id)
 			console.log(chat ['state'])
-			if( _.get(chat, ['state', user_id ] ) === undefined)
-				group.ismember = false;
-			else
-				group.ismember = true;
+			group.ismember = false;
+
+			for(let i=0; i<chat.members.length; i++){
+				if(chat.members[i] == user_id)
+					group.ismember = true;
+			}
 			ret.push(group);
 		});
 		res.json(ret);
@@ -207,7 +209,9 @@ exports.leaveGroup = function(req,res){
 					reject(err);
 				}
 				else{
-					user.chats.splice(user.chats.indexOf(groupId),1);
+					let index = user.chats.indexOf(groupId);
+					if(index >= 0)
+						user.chats.splice(index,1);
 					resolve({chat,user});
 				}
 			});
@@ -234,8 +238,6 @@ exports.leaveGroup = function(req,res){
 		console.error(err);
 		res.status(500).json({status:0, error:'error'});
 	}).then( (n_user) => {
-		
-		
 		res.status(200).json({
 			id : n_user._id,
 			username : n_user.username,
