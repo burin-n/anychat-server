@@ -3,6 +3,7 @@ let User = require('mongoose').model('User');
 var _ = require('lodash');
 
 exports.connectGroup = (socket) => {
+	console.log('connecting...')
 	return ({userId, groupId}) => {
 		socket.join(groupId);
 		updateSession({userId, groupId, socketId: socket.id}, (status) => {
@@ -10,7 +11,9 @@ exports.connectGroup = (socket) => {
 			const ret = {
 				'status' : status,
 			}
-			socket.to(socket.id).emit('join', ret);
+			console.log('printintintin')
+			socket.to(socket.id).emit('joined', ret);
+			socket.emit('joined',ret);
 		});
 	}
 }
@@ -92,20 +95,26 @@ exports.disconnect = (socket) => {
 function updateSession({userId,groupId,socketId}, callback){
 	try{
 		Chat.findById(groupId, function(err, chat){
-			if(err) callback(0);
+			if(err) {
+				console.error(err)
+				callback(0);
+			}
 			else if(!chat){
+				console.error('no chat')
 				callback(0);
 			}
 			else{
 				_.set(chat, ['state', userId, 'session'], socketId);
 				_.set(chat, ['state', userId, 'online'], true);
 				chat.save( (err) => {
+					console.error(err)
 					if(err) callback(0);
 					else callback(1);	
 				});
 			}
 		});
 	}catch(e){
+		console.error(e)
 		callback(0);
 	}
 }

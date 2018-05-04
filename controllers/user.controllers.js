@@ -18,14 +18,14 @@ exports.register = function(req,res){
 }
 
 exports.login = function(req,res){
-	User.findOne({'username': req.body.username}, 'username name password', (err, user) => {
+	User.findOne({'username': req.body.username}, 'username name password picture', (err, user) => {
 		if(err){
 			res.status(500).json({status:0, error:'login error'});
 		} else if (!user){
 			res.json({error: 'Incorrect Username'});
 		} else if (req.body.password == user.password){
 			var ret = {};
-			var fields = ['username', 'name','_id'];
+			var fields = ['username', 'name','_id', 'picture'];
 			fields.forEach( (field) => {
 				if(field == '_id') ret['id'] = user[field];
 				else ret[field] = user[field];
@@ -38,12 +38,12 @@ exports.login = function(req,res){
 }
 
 exports.getProfile = function(req,res){
-	User.findOne({'username': req.query.username}, 'username name', (err, user) => {
+	User.findOne({'username': req.query.username}, 'username name picture', (err, user) => {
 		if(err){
 			res.status(500).json({status:0, error:'get profile error'});
 		} else {
 			var ret = {};
-			var fields = ['username', 'name','_id','picture'];
+			var fields = ['username', 'name','_id', 'picture'];
 			fields.forEach( (field) => {
 				if(field == '_id') ret['id'] = user[field];
 				else ret[field] = user[field];
