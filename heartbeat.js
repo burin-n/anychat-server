@@ -6,31 +6,30 @@ if(port==''){
 	port = 5000;
 }
 
+var server1Prefix = 'http://'
+var server2Prefix = 'http://'
+var server1Domain = 'localhost'
+var server2Domain = 'localhost'
 var server1Port = 3001; //set default port for main server
 var server2Port = 3002; //set default port for second server
 var pingtime = 10;    //ms
 var serve1up;
-var destinationPort = null;
+
 var server2up;
-var prevPort = null;
-const url = 'http://172.20.10.10:'
+var prevURL = null;
+var activeURL = null;
+
 
 var app = require('express')();
 
 app.use(cors());
 app.get('/', function(req, res){
-    // testServer();
-    console.log('return : ',destinationPort);
-    if(destinationPort === null){
-        res.json({'destination' : null,
-        'timestamp' : new Date()
-        });
-    }
-    else{
-    res.json({'destination' : url+destinationPort,
+    
+    console.log('return : ',activeURL)
+    res.json({
+        'destination' : activeURL,
         'timestamp' : new Date()
     });
-    }
 });
 
 
@@ -40,10 +39,9 @@ var io = require('socket.io')(http);
 var id = setInterval( () => testServer(), pingtime);
 
 io.on('connection', function(socket){
-    if(destinationPort === null) destination = null;
-    else destination = url+destinationPort;
+  
     socket.emit('loadbalance',{
-        destination,
+        destination: activeURL,
         'timestamp' : new Date()
     });
     setInterval( () => checkEmit(socket), pingtime )
@@ -56,32 +54,24 @@ http.listen(port, function(){
  
 function checkEmit(socket){
     
-    if (prevPort != destinationPort){
-
-        if(destinationPort === null) destination = null;
-        else destination = url+destinationPort;
-        
+    if (prevURL != activeURL){
         io.emit('loadbalance',{
-            destination,
+            destination: activeURL,
             'timestamp' : new Date()
         });
-        prevPort = destinationPort;
-
+        prevURL = activeURL;
     }
 }
 
 
 
 function testServer(){
-    // console.log(socket)
-    
-
     let info = {
-        host: '172.20.10.10',
+        host: server1Domain,
         port: server1Port,
     };
     let info2 = {
-        host: '172.20.10.10',
+        host: server2Domain,
         port: server2Port,
     };
     //ping using http get
@@ -103,15 +93,13 @@ function testServer(){
     setTimeout(() => {
         
         if(serve1up){
-            destinationPort = server1Port;
+            activeURL = server1Prefix+server1Domain+':'+server1Port;
         } else if(!server2up) {
-            console.log("all server down ");
-            destinationPort = null;
+            activeURL = null;
             
         } else{
-            console.log("success ping to port "+server2Port);
-            destinationPort = server2Port;
+            activeURL = server2Prefix+server2Domain+':'+server2Port;
         }
-        console.log(url+destinationPort+" to client", new Date());
+        console.log('activeURL', activeURL, new Date());
     }, 1000);
 };
