@@ -4,10 +4,10 @@ Distributed System Class' mini project.
 For frontend server repo, it is located [here](https://github.com/thipokKub/ani-chat-front).
 
 ### Tested on
-1. node 8.11.1
-2. npm 5.6.0
-3. yarn 1.6.0
-4. mongodb 3.6.4
+    node 8.11.1
+    npm 5.6.0
+    yarn 1.6.0
+    mongodb 3.6.4
 
 ### Installation
 1. `yarn install`
@@ -24,4 +24,5 @@ For frontend server repo, it is located [here](https://github.com/thipokKub/ani-
       - The port should match configuration of heartbeat server, if not heartbeat won't find any active server.
 
 
-Run both of server, hearthbeat will communicate with frontend about which server is avaiable.
+
+Run both of backend and heartbeat, hearthbeat will communicate with frontend about which backend server is avaiable.
