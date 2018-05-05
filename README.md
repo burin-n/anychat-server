@@ -25,4 +25,6 @@ For frontend server repo, it is located [here](https://github.com/thipokKub/ani-
 
 
 
-Run both of backend and heartbeat, hearthbeat will communicate with frontend about which backend server is avaiable.
+Run both of backend and heartbeat.
+
+Hearthbeat will communicate with frontend about which backend server is avaiable.
