@@ -13,6 +13,9 @@ For frontend server repo, it is located [here](https://github.com/thipokKub/ani-
 2. API server
      - run with `yarn start [port]`
     
-      A deault port is 3001, but you can add an argument to change the port. 
+      - A deault port is 3001, but you can add an argument to change the port. 
     
-      The port should match configuration of heartbeat server, if not heartbeat won't find any active server.
+      - The port should match configuration of heartbeat server, if not heartbeat won't find any active server.
+
+
+Run both of server, hearthbeat will communicate with frontend about which server is avaiable.
