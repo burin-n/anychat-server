@@ -4,10 +4,10 @@ Distributed System Class' mini project.
 For frontend server repo, it is located [here](https://github.com/thipokKub/ani-chat-front).
 
 ### Tested on
-    node 8.11.1
-    npm 5.6.0
-    yarn 1.6.0
-    mongodb 3.6.4
+- node 8.11.1
+- npm 5.6.0
+- yarn 1.6.0
+- mongodb 3.6.4
 
 ### Installation
 1. run mongodb
