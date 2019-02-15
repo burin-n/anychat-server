@@ -5,16 +5,16 @@ var port = process.argv.slice(2);
 if(port==''){
 	port = 5000;
 }
-
-var server1Prefix = 'http://'
-var server2Prefix = 'http://'
-var server1Domain = 'localhost'
-var server2Domain = 'localhost'
+//--config-------------------------------------
+var server1Prefix = 'http://';
+var server2Prefix = 'http://';
+var server1Domain = 'localhost';
+var server2Domain = 'localhost';
 var server1Port = 3001; //set default port for main server
 var server2Port = 3002; //set default port for second server
-var pingtime = 10;    //ms
+var pingtime = 10;    //ping interval in
 var serve1up;
-
+//---------------------------------------------
 var server2up;
 var prevURL = null;
 var activeURL = null;
@@ -23,6 +23,7 @@ var activeURL = null;
 var app = require('express')();
 
 app.use(cors());
+
 app.get('/', function(req, res){
     
     console.log('return : ',activeURL)
@@ -102,4 +103,4 @@ function testServer(){
         }
         console.log('activeURL', activeURL, new Date());
     }, 1000);
-};
+}
